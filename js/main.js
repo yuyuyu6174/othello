@@ -7,6 +7,7 @@ const onlineBtn = document.getElementById("onlineBtn");
 const startBtn = document.getElementById("startBtn");
 const cpuLevelSelect = document.getElementById("cpuLevel");
 const aiDescDiv = document.getElementById("ai-description");
+const matchLabel = document.getElementById("match-info");
 
 const aiDescriptions = {
   1: "AIレベル1（弱）: 浅い深さでの簡単な評価。",
@@ -17,6 +18,17 @@ const aiDescriptions = {
   100: "AI Test2: 残りマス数に応じた動的読み。",
   101: "AI Test3: 時間制限付き反復深化。",
   102: "AI Test4: MCTS（モンテカルロ木探索）を使用。"
+};
+
+const aiShortNames = {
+  1: "弱",
+  2: "中",
+  3: "強",
+  4: "最強",
+  99: "AI Test",
+  100: "AI Test2",
+  101: "AI Test3",
+  102: "AI Test4"
 };
 
 cpuBtn.addEventListener("click", () => {
@@ -30,6 +42,7 @@ pvpBtn.addEventListener("click", () => {
   document.getElementById("mode-selection").style.display = "none";
   setVsCPU(false);
   setPlayerColor(1);
+  matchLabel.textContent = "2人対戦モード";
   document.getElementById("game-area").style.display = "block";
   initOthello();
 });
@@ -43,6 +56,7 @@ startBtn.addEventListener("click", () => {
   const playerColor = parseInt(document.getElementById("playerColor").value);
   setCpuLevel(cpuLevel);
   setPlayerColor(playerColor);
+  matchLabel.textContent = `VS CPU（${aiShortNames[cpuLevel] || "?"}）`;
   document.getElementById("controls").style.display = "none";
   document.getElementById("game-area").style.display = "block";
   initOthello();
