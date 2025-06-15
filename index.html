@@ -20,16 +20,7 @@
 
   <div id="controls" style="display:none">
     <label>CPUの強さ：
-      <select id="cpuLevel">
-        <option value="1">弱</option>
-        <option value="2">中</option>
-        <option value="3">強</option>
-        <option value="4">最強</option>
-        <option value="99">AI Test</option>
-        <option value="100">AI Test2</option>
-        <option value="101">AI Test3</option>
-        <option value="102">AI Test4</option>
-      </select>
+      <select id="cpuLevel"></select>
     </label>
     <div id="ai-description" style="margin-top: 8px; font-size: 0.9em; color: #555;"></div>
 
@@ -41,16 +32,14 @@
     </label>
     <button id="startBtn">ゲーム開始</button>
   </div>
-  <p id="match-info" style="text-align: center; font-size: 0.9em; color: #333;"></p>
+
   <div id="game-area" style="display:none">
+    <div id="cpu-status" style="margin-bottom: 5px; font-weight: bold;"></div>
     <table id="board"></table>
     <p id="message"></p>
     <button onclick="location.reload()">リスタート</button>
   </div>
 
-  <!-- 🔽 変更ポイント：main.jsをモジュールとして読み込む -->
-  <script type="module">
-    import './js/main.js';
-  </script>
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>

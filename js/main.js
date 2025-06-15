@@ -1,73 +1,76 @@
-// main.js
-import { initOthello, setVsCPU, setCpuLevel, setPlayerColor } from './game.js';
+import { initOthello, setVsCPU, setPlayerColor, setCpuLevel } from './game.js';
+import { cpuMove } from './ai.js';
+import { AI_CONFIG } from './config.js';
+
+window.cpuMove = cpuMove;
 
 const cpuBtn = document.getElementById("cpuBtn");
 const pvpBtn = document.getElementById("pvpBtn");
 const onlineBtn = document.getElementById("onlineBtn");
 const startBtn = document.getElementById("startBtn");
+
 const cpuLevelSelect = document.getElementById("cpuLevel");
 const aiDescDiv = document.getElementById("ai-description");
-const matchLabel = document.getElementById("match-info");
 
-const aiDescriptions = {
-  1: "AIレベル1（弱）: 浅い深さでの簡単な評価。",
-  2: "AIレベル2（中）: 通常より少し深く読みます。",
-  3: "AIレベル3（強）: より深い読みで強くなります。",
-  4: "AIレベル4（最強）: 深さ6の評価関数使用。",
-  99: "AI Test: 戦略的な評価関数を使用。",
-  100: "AI Test2: 残りマス数に応じた動的読み。",
-  101: "AI Test3: 時間制限付き反復深化。",
-  102: "AI Test4: MCTS（モンテカルロ木探索）を使用。"
-};
+// ▼ CPU選択肢を Config から生成（name 表示）
+function populateCpuOptions() {
+  cpuLevelSelect.innerHTML = '';
+  for (const key in AI_CONFIG) {
+    const config = AI_CONFIG[key];
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = config.name;
+    cpuLevelSelect.appendChild(option);
+  }
 
-const aiShortNames = {
-  1: "弱",
-  2: "中",
-  3: "強",
-  4: "最強",
-  99: "AI Test",
-  100: "AI Test2",
-  101: "AI Test3",
-  102: "AI Test4"
-};
+  const initial = parseInt(cpuLevelSelect.value);
+  updateCpuInfo(initial);
+}
 
+// ▼ CPU名と説明を表示
+function updateCpuInfo(level) {
+  const config = AI_CONFIG[level];
+  if (!config) return;
+
+  const desc = config.description || config.comment || "";
+  aiDescDiv.textContent = desc ? `${config.name}: ${desc}` : config.name;
+}
+
+// ▼ CPU対戦モード選択
 cpuBtn.addEventListener("click", () => {
+  setVsCPU(true);
   document.getElementById("mode-selection").style.display = "none";
   document.getElementById("controls").style.display = "flex";
-  setVsCPU(true);
-  updateAIDescription();
+  populateCpuOptions();
 });
 
-pvpBtn.addEventListener("click", () => {
-  document.getElementById("mode-selection").style.display = "none";
-  setVsCPU(false);
-  setPlayerColor(1);
-  matchLabel.textContent = "2人対戦モード";
-  document.getElementById("game-area").style.display = "block";
-  initOthello();
+// ▼ CPU選択変更時に説明更新
+cpuLevelSelect.addEventListener("change", () => {
+  const selected = parseInt(cpuLevelSelect.value);
+  updateCpuInfo(selected);
 });
 
-onlineBtn.addEventListener("click", () => {
-  alert("オンライン対戦は現在準備中です。");
-});
-
+// ▼ ゲーム開始ボタン
 startBtn.addEventListener("click", () => {
-  const cpuLevel = parseInt(cpuLevelSelect.value);
-  const playerColor = parseInt(document.getElementById("playerColor").value);
-  setCpuLevel(cpuLevel);
-  setPlayerColor(playerColor);
-  matchLabel.textContent = `VS CPU（${aiShortNames[cpuLevel] || "?"}）`;
+  const level = parseInt(cpuLevelSelect.value);
+  const color = parseInt(document.getElementById("playerColor").value);
+  setCpuLevel(level);
+  setPlayerColor(color);
   document.getElementById("controls").style.display = "none";
   document.getElementById("game-area").style.display = "block";
   initOthello();
 });
 
-cpuLevelSelect.addEventListener("change", updateAIDescription);
+// ▼ 2人対戦
+pvpBtn.addEventListener("click", () => {
+  setVsCPU(false);
+  setPlayerColor(1);
+  document.getElementById("mode-selection").style.display = "none";
+  document.getElementById("game-area").style.display = "block";
+  initOthello();
+});
 
-function updateAIDescription() {
-  const selected = parseInt(cpuLevelSelect.value);
-  aiDescDiv.textContent = aiDescriptions[selected] || "";
-}
-
-// 初期表示
-updateAIDescription();
+// ▼ オンライン未実装
+onlineBtn.addEventListener("click", () => {
+  alert("オンライン対戦は現在準備中です。");
+});

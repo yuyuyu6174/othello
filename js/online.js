@@ -11,6 +11,7 @@ const firebaseConfig = {
   firebase.initializeApp(firebaseConfig);
   
   function initOnlineGame() {
-    alert("オンライン対戦の構築は現在準備中です。今後Firebaseで実装されます。");
+    // 今後Firebaseで実装予定
+    alert("オンライン対戦の構築は現在準備中です。");
   }
   
