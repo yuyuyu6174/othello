@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>オセロ</title>
+  <link rel="stylesheet" href="style/style.css">
+</head>
+<body>
+  <h1>オセロ</h1>
+
+  <div id="mode-selection">
+    <h2>モードを選択してください</h2>
+    <div class="mode-buttons">
+      <button id="cpuBtn">CPU対戦</button>
+      <button id="pvpBtn">2人対戦</button>
+      <button id="onlineBtn">オンライン対戦</button>
+    </div>
+  </div>
+
+  <div id="controls" style="display:none">
+    <label>CPUの強さ：
+      <select id="cpuLevel">
+        <option value="1">弱</option>
+        <option value="2">中</option>
+        <option value="3">強</option>
+        <option value="4">最強</option>
+        <option value="99">AI Test</option>
+        <option value="100">AI Test2</option>
+        <option value="101">AI Test3</option>
+        <option value="102">AI Test4</option>
+      </select>
+    </label>
+    <div id="ai-description" style="margin-top: 8px; font-size: 0.9em; color: #555;"></div>
+
+    <label>プレイヤー色：
+      <select id="playerColor">
+        <option value="1">黒</option>
+        <option value="2">白</option>
+      </select>
+    </label>
+    <button id="startBtn">ゲーム開始</button>
+  </div>
+
+  <div id="game-area" style="display:none">
+    <table id="board"></table>
+    <p id="message"></p>
+    <button onclick="location.reload()">リスタート</button>
+  </div>
+
+  <!-- 🔽 変更ポイント：main.jsをモジュールとして読み込む -->
+  <script type="module">
+    import './js/main.js';
+  </script>
+</body>
+</html>
