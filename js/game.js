@@ -1,5 +1,4 @@
 // game.js
-
 import { SIZE, EMPTY, BLACK, WHITE, DIRECTIONS } from './config.js';
 import { cpuMove } from './ai.js';
 
@@ -9,7 +8,6 @@ let vsCPU = false;
 let playerColor = BLACK;
 let cpuLevel = 1;
 
-// 外部から初期設定できるようにexport
 export function setVsCPU(flag) { vsCPU = flag; }
 export function setPlayerColor(color) { playerColor = color; }
 export function setCpuLevel(level) { cpuLevel = level; }
@@ -21,7 +19,10 @@ export function initOthello() {
   turn = BLACK;
   drawBoard();
   updateMessage(`${turn === BLACK ? "黒" : "白"}の番です`);
-  if (vsCPU && playerColor === WHITE) setTimeout(() => cpuMove(board, turn, playerColor, cpuLevel, placeAndNext), 300);
+  if (vsCPU && playerColor === WHITE) {
+    const cpuColor = BLACK;
+    setTimeout(() => cpuMove(board, turn, playerColor, cpuLevel, placeAndNext), 300);
+  }
 }
 
 function updateMessage(text) {
@@ -77,12 +78,16 @@ function nextTurn() {
     updateMessage(`${turn === BLACK ? "黒" : "白"}は打てません。パス！`);
     turn = 3 - turn;
     drawBoard();
-    if (vsCPU && turn !== playerColor) setTimeout(() => cpuMove(board, turn, playerColor, cpuLevel, placeAndNext), 300);
+    if (vsCPU && turn !== playerColor) {
+      setTimeout(() => cpuMove(board, turn, playerColor, cpuLevel, placeAndNext), 300);
+    }
     return;
   }
   updateMessage(`${turn === BLACK ? "黒" : "白"}の番です`);
   drawBoard();
-  if (vsCPU && turn !== playerColor) setTimeout(() => cpuMove(board, turn, playerColor, cpuLevel, placeAndNext), 300);
+  if (vsCPU && turn !== playerColor) {
+    setTimeout(() => cpuMove(board, turn, playerColor, cpuLevel, placeAndNext), 300);
+  }
 }
 
 function getFlips(x, y, color) {
