@@ -10,11 +10,7 @@ import {
 export function cpuMove() {
   const config = AI_CONFIG[window.cpuLevel] || AI_CONFIG[1];
 
-  // 評価関数取得（options を渡す可能性）
   const evalFunc = (b) => {
-    if (config.evaluator === evaluateStrategicAdvancedBoard) {
-      return config.evaluator(b, turn, config);
-    }
     return config.evaluator(b, turn, config);
   };
 
@@ -60,7 +56,7 @@ export function cpuMove() {
   }
 
   else if (config.type === 'mcts') {
-    const move = mctsSelectMove(board, turn, config.simulations);
+    const move = mctsSelectMoveUCT(board, turn, config);
     if (move) place(move.x, move.y, move.flips);
     nextTurn();
   }
@@ -102,22 +98,47 @@ function getDynamicDepth(table) {
   return 2;
 }
 
-function mctsSelectMove(b, color, simulations = 100) {
+// --- MCTS with UCT ---
+function mctsSelectMoveUCT(b, color, config) {
   const moves = getAllValidMoves(color, b);
   if (moves.length === 0) return null;
 
-  const scores = new Map();
-  for (const move of moves) {
-    scores.set(move, 0);
-    for (let i = 0; i < simulations; i++) {
-      const result = simulateRandomPlayout(simulateMove(b, move, color), 3 - color);
-      scores.set(move, scores.get(move) + result);
+  const stats = new Map(); // move => { wins, visits }
+  const start = Date.now();
+  const maxSim = config.simulations ?? 100;
+  const limit = config.timeLimit ?? null;
+  const C = config.explorationConstant ?? 1.41;
+  let totalSimulations = 0;
+
+  while (
+    (!limit || Date.now() - start < limit) &&
+    totalSimulations < maxSim * moves.length
+  ) {
+    for (const move of moves) {
+      const state = simulateMove(b, move, color);
+      const result = simulateRandomPlayout(state, 3 - color, config);
+
+      if (!stats.has(move)) stats.set(move, { wins: 0, visits: 0 });
+      const stat = stats.get(move);
+      stat.wins += result;
+      stat.visits++;
+      totalSimulations++;
     }
   }
-  return [...scores.entries()].sort((a, b) => b[1] - a[1])[0][0];
+
+  const best = [...stats.entries()]
+    .map(([move, stat]) => {
+      const winRate = stat.wins / stat.visits;
+      const uct = winRate + C * Math.sqrt(Math.log(totalSimulations) / stat.visits);
+      return { move, uct };
+    })
+    .sort((a, b) => b.uct - a.uct)[0]?.move;
+
+  return best;
 }
 
-function simulateRandomPlayout(board, color) {
+// --- 評価関数ベースのプレイアウト ---
+function simulateRandomPlayout(board, color, config) {
   let currentBoard = board.map(row => row.slice());
   let currentColor = color;
   let passes = 0;
@@ -135,17 +156,6 @@ function simulateRandomPlayout(board, color) {
     currentColor = 3 - currentColor;
   }
 
-  const { white, black } = countStones(currentBoard);
-  return white > black ? 1 : white === black ? 0 : -1;
-}
-
-function countStones(board) {
-  let white = 0, black = 0;
-  for (let row of board) {
-    for (let cell of row) {
-      if (cell === WHITE) white++;
-      else if (cell === BLACK) black++;
-    }
-  }
-  return { white, black };
+  const finalEval = config.evaluator(currentBoard, window.playerColor, config);
+  return finalEval > 0 ? 1 : finalEval === 0 ? 0 : -1;
 }
