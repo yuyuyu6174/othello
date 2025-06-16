@@ -14,10 +14,6 @@ export function setPlayerColor(color) { playerColor = color; window.playerColor 
 
 // 初期化
 export function initOthello() {
-  // 再戦ボタンを非表示にする
-  const btn = document.getElementById("rematchBtn");
-  if (btn) btn.style.display = "none";
-
   board = Array.from({ length: SIZE }, () => Array(SIZE).fill(EMPTY));
 
   // 初期配置
@@ -29,6 +25,7 @@ export function initOthello() {
   turn = BLACK;
   drawBoard();
   document.getElementById("message").textContent = "黒の番です";
+  document.getElementById("rematchBtn").style.display = "none";
 
   if (vsCPU && playerColor === WHITE) {
     document.getElementById("message").textContent = "CPU思考中...";
@@ -120,9 +117,7 @@ function endGame() {
     `ゲーム終了！ 黒:${black} 白:${white} → ` +
     (black === white ? "引き分け" : (black > white ? "黒の勝ち！" : "白の勝ち！"));
 
-  // 再戦ボタン表示
-  const btn = document.getElementById("rematchBtn");
-  if (btn) btn.style.display = "inline-block";
+  document.getElementById("rematchBtn").style.display = "inline-block";
 }
 
 // 有効な手を取得
@@ -163,7 +158,7 @@ function hasValidMoves(color, b = board) {
   return getAllValidMoves(color, b).length > 0;
 }
 
-// 盤面をシミュレートして返す（AI用）
+// AI用：盤面をシミュレートして返す
 export function simulateMove(b, move, color) {
   const copy = b.map(row => row.slice());
   copy[move.y][move.x] = color;
