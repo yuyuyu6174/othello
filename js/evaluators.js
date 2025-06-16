@@ -3,12 +3,12 @@ import { SIZE, EMPTY, BLACK, WHITE } from './config.js';
 // ✅ デフォルト評価マトリクス（weights）
 export const DEFAULT_WEIGHTS = [
   [100, -25, 10, 5, 5, 10, -25, 100],
-  [-25, -50, 1, 1, 1, 1, -50, -25],
-  [10, 1, 3, 2, 2, 3, 1, 10],
-  [5, 1, 2, 1, 1, 2, 1, 5],
-  [5, 1, 2, 1, 1, 2, 1, 5],
-  [10, 1, 3, 2, 2, 3, 1, 10],
-  [-25, -50, 1, 1, 1, 1, -50, -25],
+  [-25, -50,  1, 1, 1,  1, -50, -25],
+  [ 10,   1,  3, 2, 2,  3,   1,  10],
+  [  5,   1,  2, 1, 1,  2,   1,   5],
+  [  5,   1,  2, 1, 1,  2,   1,   5],
+  [ 10,   1,  3, 2, 2,  3,   1,  10],
+  [-25, -50,  1, 1, 1,  1, -50, -25],
   [100, -25, 10, 5, 5, 10, -25, 100]
 ];
 
@@ -80,6 +80,7 @@ export function evaluateStrategicBoard(board, color, config = {}) {
   const stableBonus = 20;
   const parityBonus = 40;
   const xPenalty = 30;
+  const trapPenalty = 30;
 
   // weights 評価
   if (useWeights) {
@@ -124,6 +125,20 @@ export function evaluateStrategicBoard(board, color, config = {}) {
     }
   }
 
+  // 危険な角付近の打ち手を避ける
+  if (config.avoidCornerTrap) {
+    const trapSquares = [
+      [0, 1], [1, 0], [1, 1],
+      [0, 6], [1, 7], [1, 6],
+      [6, 0], [6, 1], [7, 1],
+      [6, 6], [6, 7], [7, 6],
+    ];
+    for (const [x, y] of trapSquares) {
+      if (board[y][x] === color) score -= trapPenalty;
+      if (board[y][x] === opponent) score += trapPenalty;
+    }
+  }
+
   return score;
 }
 
@@ -136,6 +151,7 @@ export function evaluateStrategicAdvancedBoard(board, color, config = {}) {
   const stableBonus = config.stableStoneBonus ?? 20;
   const parityBonus = config.parityWeight ?? 40;
   const xPenalty = config.xSquarePenalty ?? 50;
+  const trapPenalty = config.trapPenalty ?? 30;
 
   // weights
   for (let y = 0; y < SIZE; y++) {
@@ -175,6 +191,20 @@ export function evaluateStrategicAdvancedBoard(board, color, config = {}) {
     for (const [x, y] of xSquares) {
       if (board[y][x] === color) score -= xPenalty;
       if (board[y][x] === opponent) score += xPenalty;
+    }
+  }
+
+  // 危険な角付近の打ち手を避ける
+  if (config.avoidCornerTrap) {
+    const trapSquares = [
+      [0, 1], [1, 0], [1, 1],
+      [0, 6], [1, 7], [1, 6],
+      [6, 0], [6, 1], [7, 1],
+      [6, 6], [6, 7], [7, 6],
+    ];
+    for (const [x, y] of trapSquares) {
+      if (board[y][x] === color) score -= trapPenalty;
+      if (board[y][x] === opponent) score += trapPenalty;
     }
   }
 

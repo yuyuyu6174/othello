@@ -102,23 +102,42 @@ export const AI_CONFIG = {
     penalizeXSquare: true
   },
 
+  // 104: {
+  //   visible: true,
+  //   name: "AI Test4",
+  //     comment: "MCTS（モンテカルロ木探索）を使用",
+  //   type: "mcts",
+  //   simulations: 300,
+  //   timeLimit: 1000,
+  //   explorationConstant: 1.41,
+  //   evaluator: evaluateStrategicAdvancedBoard,
+  //   useWeights: true,
+  //   avoidCornerTrap: true,
+  //   evaluateStableStones: true,
+  //   considerParity: true,
+  //   penalizeXSquare: true,
+  //   parityWeight: 40,
+  //   stableStoneBonus: 20,
+  //   xSquarePenalty: 50
+  // },
+
   104: {
     visible: true,
     name: "AI Test4",
-      comment: "MCTS（モンテカルロ木探索）を使用",
+    comment: "MCTS（モンテカルロ木探索）を使用",
     type: "mcts",
-    simulations: 300,
-    timeLimit: 1000,
-    explorationConstant: 1.41,
+    simulations: 800,
+    timeLimit: 2000,
+    explorationConstant: 1.25,
     evaluator: evaluateStrategicAdvancedBoard,
     useWeights: true,
     avoidCornerTrap: true,
     evaluateStableStones: true,
     considerParity: true,
     penalizeXSquare: true,
-    parityWeight: 40,
-    stableStoneBonus: 20,
-    xSquarePenalty: 50
+    parityWeight: 50,
+    stableStoneBonus: 30,
+    xSquarePenalty: 60
   },
 
   105: {
