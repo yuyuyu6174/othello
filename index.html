@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>オセロ</title>
   <link rel="stylesheet" href="style/style.css">
 </head>
@@ -34,10 +34,11 @@
   </div>
 
   <div id="game-area" style="display:none">
-    <div id="cpu-status" style="margin-bottom: 5px; font-weight: bold;"></div>
+    <div id="mode-label" style="margin-bottom: 10px; font-size: 1.2em; font-weight: bold;"></div>
     <table id="board"></table>
     <p id="message"></p>
-    <button onclick="location.reload()">リスタート</button>
+    <button onclick="location.reload()">タイトルに戻る</button>
+    <button id="rematchBtn" style="display:none">再戦する</button>
   </div>
 
   <script type="module" src="./js/main.js"></script>

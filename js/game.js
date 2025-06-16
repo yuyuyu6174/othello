@@ -14,6 +14,10 @@ export function setPlayerColor(color) { playerColor = color; window.playerColor 
 
 // 初期化
 export function initOthello() {
+  // 再戦ボタンを非表示にする
+  const btn = document.getElementById("rematchBtn");
+  if (btn) btn.style.display = "none";
+
   board = Array.from({ length: SIZE }, () => Array(SIZE).fill(EMPTY));
 
   // 初期配置
@@ -115,6 +119,10 @@ function endGame() {
   document.getElementById("message").textContent =
     `ゲーム終了！ 黒:${black} 白:${white} → ` +
     (black === white ? "引き分け" : (black > white ? "黒の勝ち！" : "白の勝ち！"));
+
+  // 再戦ボタン表示
+  const btn = document.getElementById("rematchBtn");
+  if (btn) btn.style.display = "inline-block";
 }
 
 // 有効な手を取得
