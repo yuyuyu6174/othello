@@ -118,6 +118,13 @@ function endGame() {
     (black === white ? "引き分け" : (black > white ? "黒の勝ち！" : "白の勝ち！"));
 
   document.getElementById("rematchBtn").style.display = "inline-block";
+  if (rematchBtn) {
+    rematchBtn.addEventListener("click", () => {
+      document.getElementById("game-area").style.display = "block";
+      document.getElementById("rematchBtn").style.display = "none";
+      initOthello();
+    });
+  }
 }
 
 // 有効な手を取得

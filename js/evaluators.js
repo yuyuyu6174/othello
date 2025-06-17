@@ -1,6 +1,6 @@
 import { SIZE, EMPTY, BLACK, WHITE } from './config.js';
 
-// ✅ デフォルト評価マトリクス（weights）
+// デフォルト評価マトリクス（weights）
 export const DEFAULT_WEIGHTS = [
   [100, -25, 10, 5, 5, 10, -25, 100],
   [-25, -50,  1, 1, 1,  1, -50, -25],
@@ -12,7 +12,7 @@ export const DEFAULT_WEIGHTS = [
   [100, -25, 10, 5, 5, 10, -25, 100]
 ];
 
-// ✅ 安定石の検出（角と端から埋まっている石を抽出）
+// 安定石の検出（角と端から埋まっている石を抽出）
 function getStableStones(board) {
   const stable = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
   const directions = [
@@ -44,7 +44,7 @@ function getStableStones(board) {
   return stable;
 }
 
-// ✅ 石数カウント
+// 石数カウント
 function countStones(board) {
   let white = 0, black = 0;
   for (let row of board) {
@@ -56,7 +56,7 @@ function countStones(board) {
   return { white, black };
 }
 
-// ✅ 軽量評価：石の数だけを見る
+// 軽量評価：石の数だけを見る
 export function evaluateBoard(board, color) {
   const opponent = 3 - color;
   let score = 0;
@@ -69,20 +69,32 @@ export function evaluateBoard(board, color) {
   return score;
 }
 
-// ✅ 戦略評価（weights + 戦略フラグ + ON/OFF設定対応）
+// 戦略評価（固定ボーナス）
 export function evaluateStrategicBoard(board, color, config = {}) {
+  return evaluateStrategicGeneralBoard(board, color, config, true);
+}
+
+// 高度な戦略評価（パラメータ調整対応）
+export function evaluateStrategicAdvancedBoard(board, color, config = {}) {
+  return evaluateStrategicGeneralBoard(board, color, config, false);
+}
+
+// 共通評価関数（共通ロジック + 固定値orconfigで切替）
+function evaluateStrategicGeneralBoard(board, color, config = {}, useDefaults = true) {
   const opponent = 3 - color;
   let score = 0;
 
+  // マス重み設定
   const weights = config.weights || DEFAULT_WEIGHTS;
-  const useWeights = config.useWeights !== false; // デフォルト true
+  const useWeights = config.useWeights !== false;
 
-  const stableBonus = 20;
-  const parityBonus = 40;
-  const xPenalty = 30;
-  const trapPenalty = 30;
+  // ボーナス・ペナルティ（デフォルト or config指定）
+  const stableBonus = useDefaults ? 20 : config.stableStoneBonus ?? 20;
+  const parityBonus = useDefaults ? 40 : config.parityWeight ?? 40;
+  const xPenalty = useDefaults ? 30 : config.xSquarePenalty ?? 50;
+  const trapPenalty = useDefaults ? 30 : config.trapPenalty ?? 30;
 
-  // weights 評価
+  // 1. weights による評価
   if (useWeights) {
     for (let y = 0; y < SIZE; y++) {
       for (let x = 0; x < SIZE; x++) {
@@ -93,7 +105,7 @@ export function evaluateStrategicBoard(board, color, config = {}) {
     }
   }
 
-  // 安定石評価
+  // 2. 安定石ボーナス
   if (config.evaluateStableStones) {
     const stable = getStableStones(board);
     for (let y = 0; y < SIZE; y++) {
@@ -104,7 +116,7 @@ export function evaluateStrategicBoard(board, color, config = {}) {
     }
   }
 
-  // パリティ評価（終盤のみ）
+  // 3. パリティ（終盤で石差が有利な方に加点）
   if (config.considerParity) {
     const empty = board.flat().filter(c => c === EMPTY).length;
     if (empty <= 16) {
@@ -114,93 +126,20 @@ export function evaluateStrategicBoard(board, color, config = {}) {
     }
   }
 
-  // X打ち評価（角の斜め前）
+  // 4. Xマス（角の斜め前）に打った場合ペナルティ
   if (config.penalizeXSquare) {
-    const xSquares = [
-      [1, 1], [6, 1], [1, 6], [6, 6]
-    ];
+    const xSquares = [ [1,1], [6,1], [1,6], [6,6] ];
     for (const [x, y] of xSquares) {
       if (board[y][x] === color) score -= xPenalty;
       if (board[y][x] === opponent) score += xPenalty;
     }
   }
 
-  // 危険な角付近の打ち手を避ける
+  // 5. 危険な角周辺の罠マスペナルティ
   if (config.avoidCornerTrap) {
     const trapSquares = [
-      [0, 1], [1, 0], [1, 1],
-      [0, 6], [1, 7], [1, 6],
-      [6, 0], [6, 1], [7, 1],
-      [6, 6], [6, 7], [7, 6],
-    ];
-    for (const [x, y] of trapSquares) {
-      if (board[y][x] === color) score -= trapPenalty;
-      if (board[y][x] === opponent) score += trapPenalty;
-    }
-  }
-
-  return score;
-}
-
-// ✅ 高度な戦略評価（全ての個別設定対応）
-export function evaluateStrategicAdvancedBoard(board, color, config = {}) {
-  const opponent = 3 - color;
-  let score = 0;
-
-  const weights = config.weights || DEFAULT_WEIGHTS;
-  const stableBonus = config.stableStoneBonus ?? 20;
-  const parityBonus = config.parityWeight ?? 40;
-  const xPenalty = config.xSquarePenalty ?? 50;
-  const trapPenalty = config.trapPenalty ?? 30;
-
-  // weights
-  for (let y = 0; y < SIZE; y++) {
-    for (let x = 0; x < SIZE; x++) {
-      const cell = board[y][x];
-      if (cell === color) score += weights[y][x];
-      else if (cell === opponent) score -= weights[y][x];
-    }
-  }
-
-  // 安定石
-  if (config.evaluateStableStones) {
-    const stable = getStableStones(board);
-    for (let y = 0; y < SIZE; y++) {
-      for (let x = 0; x < SIZE; x++) {
-        if (stable[y][x] === color) score += stableBonus;
-        else if (stable[y][x] === opponent) score -= stableBonus;
-      }
-    }
-  }
-
-  // パリティ（終盤）
-  if (config.considerParity) {
-    const empty = board.flat().filter(c => c === EMPTY).length;
-    if (empty <= 16) {
-      const count = countStones(board);
-      const parity = (color === WHITE ? count.white - count.black : count.black - count.white);
-      score += parityBonus * Math.sign(parity);
-    }
-  }
-
-  // X打ち
-  if (config.penalizeXSquare) {
-    const xSquares = [
-      [1, 1], [6, 1], [1, 6], [6, 6]
-    ];
-    for (const [x, y] of xSquares) {
-      if (board[y][x] === color) score -= xPenalty;
-      if (board[y][x] === opponent) score += xPenalty;
-    }
-  }
-
-  // 危険な角付近の打ち手を避ける
-  if (config.avoidCornerTrap) {
-    const trapSquares = [
-      [0, 1], [1, 0], [1, 1],
-      [0, 6], [1, 7], [1, 6],
-      [6, 0], [6, 1], [7, 1],
-      [6, 6], [6, 7], [7, 6],
+      [0,1],[1,0],[1,1],[0,6],[1,7],[1,6],
+      [6,0],[6,1],[7,1],[6,6],[6,7],[7,6]
     ];
     for (const [x, y] of trapSquares) {
       if (board[y][x] === color) score -= trapPenalty;

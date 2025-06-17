@@ -21,7 +21,7 @@ export const AI_CONFIG = {
   1: {
     visible: true,
     name: "弱",
-        comment: "浅い読みとシンプルな評価（初心者向け）",
+    comment: "浅い読みとシンプルな評価（初心者向け）",
     type: "minimax",
     depth: 1,
     evaluator: evaluateBoard
@@ -29,7 +29,7 @@ export const AI_CONFIG = {
   2: {
     visible: true,
     name: "中",
-      comment: "標準的な深さのミニマックス探索",
+    comment: "標準的な深さのミニマックス探索",
     type: "minimax",
     depth: 2,
     evaluator: evaluateBoard
@@ -37,7 +37,7 @@ export const AI_CONFIG = {
   3: {
     visible: true,
     name: "強",
-      comment: "さらに深い探索で安定したプレイ",
+    comment: "さらに深い探索で安定したプレイ",
     type: "minimax",
     depth: 3,
     evaluator: evaluateBoard
@@ -45,7 +45,7 @@ export const AI_CONFIG = {
   4: {
     visible: true,
     name: "最強",
-      comment: "深さ6の高精度ミニマックス探索（実践向け）",
+    comment: "深さ6の高精度ミニマックス探索（実践向け）",
     type: "minimax",
     depth: 6,
     evaluator: evaluateStrategicBoard,
@@ -58,7 +58,7 @@ export const AI_CONFIG = {
   101: {
     visible: true,
     name: "AI Test1",
-      comment: "戦略評価を導入",
+    comment: "戦略評価を導入",
     type: "minimax",
     depth: 6,
     evaluator: evaluateStrategicBoard,
@@ -72,7 +72,7 @@ export const AI_CONFIG = {
   102: {
     visible: true,
     name: "AI Test2",
-      comment: "残りマス数に応じて深さを調整（動的読み）",
+    comment: "残りマス数に応じて深さを調整（動的読み）",
     type: "minimax",
     dynamicDepth: true,
     depthTable: [
@@ -91,7 +91,7 @@ export const AI_CONFIG = {
   103: {
     visible: true,
     name: "AI Test3",
-      comment: "反復深化探索（時間制限あり）",
+    comment: "反復深化探索（時間制限あり）",
     type: "iterative",
     timeLimit: 1000,
     evaluator: evaluateStrategicBoard,
@@ -102,46 +102,27 @@ export const AI_CONFIG = {
     penalizeXSquare: true
   },
 
-  // 104: {
-  //   visible: true,
-  //   name: "AI Test4",
-  //     comment: "MCTS（モンテカルロ木探索）を使用",
-  //   type: "mcts",
-  //   simulations: 300,
-  //   timeLimit: 1000,
-  //   explorationConstant: 1.41,
-  //   evaluator: evaluateStrategicAdvancedBoard,
-  //   useWeights: true,
-  //   avoidCornerTrap: true,
-  //   evaluateStableStones: true,
-  //   considerParity: true,
-  //   penalizeXSquare: true,
-  //   parityWeight: 40,
-  //   stableStoneBonus: 20,
-  //   xSquarePenalty: 50
-  // },
-
   104: {
     visible: true,
     name: "AI Test4",
     comment: "MCTS（モンテカルロ木探索）を使用",
     type: "mcts",
-    simulations: 800,
-    timeLimit: 2000,
-    explorationConstant: 1.25,
+    simulations: 1000, // 300
+    timeLimit: 1500, // 1000
+    explorationConstant: 1.1, // 1.41
     evaluator: evaluateStrategicAdvancedBoard,
     useWeights: true,
     avoidCornerTrap: true,
     evaluateStableStones: true,
     considerParity: true,
     penalizeXSquare: true,
-    parityWeight: 50,
-    stableStoneBonus: 30,
-    xSquarePenalty: 60
+    parityWeight: 50, // 40
+    stableStoneBonus: 30, // 20
+    xSquarePenalty: 60 // 50
   },
 
   105: {
-    visible: true,
+    visible: false,
     name: "AI Test5",
     comment: "評価カスタムを実装",
     type: "minimax",
@@ -169,7 +150,80 @@ export const AI_CONFIG = {
     penalizeXSquare: true,
     parityWeight: 40,
     stableStoneBonus: 20,
-    xSquarePenalty: 50
+    xSquarePenalty: 50,
+
+    // 終局完全読みの設定
+    useEndgameSolver: true,
+    endgame: {
+      maxEmpty: 12,      // 空きマスが12以下なら終局読み開始
+      usePruning: true   // 枝刈りを有効にする
+    }
+  },
+
+  106: {
+    visible: true,
+    name: "AI Test6",
+    comment: "残り12マスになると完全終局読みを使用",
+    type: "minimax",
+    dynamicDepth: true,
+    depthTable: [
+      { max: 20, depth: 8 },
+      { max: 40, depth: 6 },
+      { max: 64, depth: 5 }
+    ],
+    evaluator: evaluateStrategicBoard,
+    useWeights: true,
+    avoidCornerTrap: true,
+    evaluateStableStones: true,
+    considerParity: true,
+    penalizeXSquare: true,
+
+    // 終局完全読みの設定
+    useEndgameSolver: true,
+    endgame: {
+      maxEmpty: 12,      // 空きマスが12以下なら終局読み開始
+      usePruning: true   // 枝刈りを有効にする
+    }
+  },
+  999: {
+    visible: true,
+    name: "Noob",
+    comment: "最深読みと戦略フル活用。",
+    // type: "iterative",
+    // timeLimit: 1500,
+    type: "minimax",
+    dynamicDepth: true,
+    depthTable: [
+      { max: 20, depth: 8 },
+      { max: 40, depth: 6 },
+      { max: 64, depth: 5 }
+    ],
+    evaluator: evaluateStrategicAdvancedBoard,
+    useWeights: true,
+    weights: [
+      [100, -40, 20,  5,  5, 20, -40, 100],
+      [-40, -80, -1, -1, -1, -1, -80, -40],
+      [ 20,  -1,  5,  1,  1,  5,  -1,  20],
+      [  5,  -1,  1,  0,  0,  1,  -1,   5],
+      [  5,  -1,  1,  0,  0,  1,  -1,   5],
+      [ 20,  -1,  5,  1,  1,  5,  -1,  20],
+      [-40, -80, -1, -1, -1, -1, -80, -40],
+      [100, -40, 20,  5,  5, 20, -40, 100]
+    ],
+    avoidCornerTrap: true,
+    evaluateStableStones: true,
+    considerParity: true,
+    penalizeXSquare: true,
+    parityWeight: 60,
+    stableStoneBonus: 30,
+    xSquarePenalty: 60,
+    trapPenalty: 40,
+
+    useEndgameSolver: true,
+    endgame: {
+      maxEmpty: 16,
+      usePruning: true
+    }
   }
 };
 
@@ -217,5 +271,11 @@ penalizeXSquare       // X打ち（角の斜め前）を避ける（true/false�
 parityWeight          // パリティの重み（デフォ: 40）
 stableStoneBonus      // 安定石ボーナス（デフォ: 20）
 xSquarePenalty        // X打ちペナルティ（デフォ: 50）
+
+【終局完全読み設定】
+useEndgameSolver      // true で終局完全読み（全探索）を有効にする
+endgame               // 終局読みの詳細設定（オブジェクト）
+  ├─ maxEmpty         // 空きマス数がこの値以下になったら終局完全読みを開始（例: 12）
+  └─ usePruning       // true なら、探索中に最大評価（例: 64点差）に達した時点で枝刈りして打ち切る
 
 */
